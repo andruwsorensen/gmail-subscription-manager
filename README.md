@@ -22,6 +22,37 @@ Gmail Subscription Manager is a web application that helps users manage their em
 
 ## Usage
 
-[Add usage instructions here] 
+[Add usage instructions here]
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies:
+   ```
+   npm install
+   cd client && npm install
+   ```
+3. Set up Google OAuth 2.0 credentials:
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+   - Enable the Gmail API for your project
+   - Create OAuth 2.0 credentials (OAuth client ID)
+   - Download the credentials and save them as `server/src/credentials.json`
+
+4. Start the development server:
+   ```
+   npm run dev
+   ```
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+```
+
+Replace `your_client_id` and `your_client_secret` with the values from your Google OAuth 2.0 credentials.
 
 

@@ -40,8 +40,5 @@ Thumbs.db
 server/src/credentials.json
 server/src/token.json
 
-   # Dependencies
-   node_modules/
-   
-   # Build cache
-   .cache/
+# Build cache
+.cache/
