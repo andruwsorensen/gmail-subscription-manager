@@ -1,0 +1,120 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+}
+
+main {
+  padding: 20px;
+}
+
+.subscription-manager {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+button {
+  background-color: #61dafb;
+  border: none;
+  color: #282c34;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+}
+
+.subscription-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.subscription-list li {
+  background-color: #f1f1f1;
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.subscription-table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-header, .table-row {
+  display: table-row;
+}
+
+.table-header {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
+.count-column, .email-column, .action-column {
+  display: table-cell;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.count-column {
+  width: 15%;
+  text-align: center;
+}
+
+.email-column {
+  width: 60%;
+}
+
+.action-column {
+  width: 30%;
+  text-align: center;
+}
+
+.unsubscribe-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.unsubscribe-link:hover {
+  text-decoration: underline;
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.sort-button:hover {
+  text-decoration: underline;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 10px;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
