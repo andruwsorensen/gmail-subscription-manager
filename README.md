@@ -55,4 +55,9 @@ GOOGLE_CLIENT_SECRET=your_client_secret
 
 Replace `your_client_id` and `your_client_secret` with the values from your Google OAuth 2.0 credentials.
 
+## Token Setup
+
+1. The `token.json` file will be automatically generated when you first authenticate with Google.
+2. Make sure `token.json` is listed in your `.gitignore` file to prevent accidental commits of sensitive information.
+
 
