@@ -23,6 +23,11 @@ const SubscriptionManager: React.FC = () => {
     setError(null);
     try {
       const response = await fetch('/api/subscriptions');
+      if (response.status === 403) {
+        // Authentication required, redirect directly to Google OAuth
+        window.location.href = '/auth';
+        return;
+      }
       if (!response.ok) {
         throw new Error('Failed to fetch subscriptions');
       }
@@ -34,7 +39,7 @@ const SubscriptionManager: React.FC = () => {
         emailCount: details.emailCount
       })));
     } catch (err) {
-      setError('An error occurred while loading subscriptions');
+      setError('An error occurred with Google Authentication');
       console.error(err);
     } finally {
       setIsLoading(false);

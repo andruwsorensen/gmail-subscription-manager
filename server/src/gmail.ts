@@ -6,60 +6,26 @@ import * as path from 'path';
 
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 const TOKEN_PATH = path.join(__dirname, 'token.json');
+const CREDENTIALS_PATH = path.join(__dirname, 'credentials.json');
 
 interface EmailSenderData {
   unsubscribeLink: string;
   emailCount: number;
 }
 
-
 const authenticateGmail = async (): Promise<OAuth2Client> => {
-    let credentials;
-    try {
-        credentials = JSON.parse(fs.readFileSync(path.join(__dirname, 'credentials.json'), 'utf8'));
-    } catch (error) {
-        console.error('Error reading credentials file:', error);
-        throw new Error('Failed to load credentials');
-    }
-
-    const { client_secret, client_id, redirect_uris } = credentials.installed;
+    const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+    const { client_secret, client_id, redirect_uris } = credentials.web;
     const oAuth2Client = new OAuth2Client(client_id, client_secret, redirect_uris[0]);
 
-    if (fs.existsSync(TOKEN_PATH)) {
-        const token = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
-        oAuth2Client.setCredentials(token);
+    try {
+        const token = fs.readFileSync(TOKEN_PATH, 'utf8');
+        oAuth2Client.setCredentials(JSON.parse(token));
         return oAuth2Client;
-    } else {
-        return getNewToken(oAuth2Client);
+    } catch (err) {
+        console.log('No token found.');
+        return oAuth2Client;
     }
-};
-
-const getNewToken = async (oAuth2Client: OAuth2Client): Promise<OAuth2Client> => {
-    const authUrl = oAuth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: SCOPES,
-    });
-    console.log('Authorize this app by visiting this URL:', authUrl);
-    
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-
-    const code = await new Promise<string>((resolve) => {
-        rl.question('Enter the code from that page here: ', (code) => {
-            rl.close();
-            resolve(code);
-        });
-    });
-
-    const { tokens } = await oAuth2Client.getToken(code);
-    oAuth2Client.setCredentials(tokens);
-    
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
-    console.log('Token stored to', TOKEN_PATH);
-    
-    return oAuth2Client;
 };
 
 const listSubscriptionEmails = async (auth: any) => {
@@ -116,9 +82,6 @@ const listSubscriptionEmails = async (auth: any) => {
       };
     }
   }
-  
-  
+
 export { authenticateGmail, listSubscriptionEmails };
 
-// Comment out or remove the main() function call at the bottom of the file
-// main();

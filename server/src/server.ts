@@ -1,35 +1,74 @@
 import express from 'express';
-import path from 'path';
+import * as path from 'path';
 import { authenticateGmail, listSubscriptionEmails } from './gmail';
+import { OAuth2Client } from 'google-auth-library';
+import { google } from 'googleapis';
+import cors from 'cors';
+import * as fs from 'fs';
 
 const app = express();
-const port = 5001;
+app.use(cors());
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
+const TOKEN_PATH = path.join(__dirname, 'token.json');
+const CREDENTIALS_PATH = path.join(__dirname, 'credentials.json');
 
-app.get('/', (req, res) => {
-  res.render('index');
-});
+let oAuth2Client: OAuth2Client;
 
 app.get('/api/subscriptions', async (req, res) => {
-  // In this Express.js route handler:
-  // 'res' stands for 'response'. It's an object representing the HTTP response
-  // that Express sends when it receives an HTTP request.
   try {
     const auth = await authenticateGmail();
     const subscriptions = await listSubscriptionEmails(auth);
-    // Here, res.json() is used to send a JSON response back to the client
-    console.log('Subscriptions:', subscriptions);
     res.json(subscriptions);
   } catch (error) {
-    console.error('Error:', error);
-    // In case of an error, res is used to send a 500 status code and an error message
-    res.status(500).json({ error: 'An error occurred while fetching subscriptions' });
+      console.error('Error:', error);
+      res.status(500).json({ error: 'An error occurred while fetching subscriptions' });
+    }
+});
+
+app.get('/auth', (req, res) => {
+   const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+   const { client_secret, client_id, redirect_uris } = credentials.web;
+   const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+   const authUrl = oAuth2Client.generateAuthUrl({
+     access_type: 'offline',
+     scope: SCOPES,
+   });
+   res.json({ authUrl }); 
+
+});
+
+app.get('/oauth2callback*', async (req, res) => {
+  const code = req.query.code as string; // Extract the code from the query parameters
+
+  if (!code) {
+    return res.status(400).send('Missing authorization code');
+  }
+
+  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+  const { client_secret, client_id, redirect_uris } = credentials.web;
+
+  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
+  try {
+    // Exchange authorization code for tokens
+    const { tokens } = await oAuth2Client.getToken(code);
+    oAuth2Client.setCredentials(tokens);
+
+    // Store the token
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
+
+    // Redirect to a success page or return success message
+    res.redirect('http://localhost:3000');
+  } catch (error) {
+    console.error('Error while exchanging the code for tokens:', error);
+    res.status(500).send('Error during token exchange');
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
