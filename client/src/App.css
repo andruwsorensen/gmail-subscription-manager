@@ -13,7 +13,7 @@ main {
 }
 
 .subscription-manager {
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
@@ -79,10 +79,11 @@ button:disabled {
 
 .email-column {
   width: 60%;
+  text-align: center;
 }
 
 .action-column {
-  width: 30%;
+  width: 50%;
   text-align: center;
 }
 
@@ -101,7 +102,7 @@ button:disabled {
   cursor: pointer;
   font-weight: bold;
   padding: 0;
-  text-align: left;
+  text-align: center;
   width: 100%;
 }
 
@@ -117,4 +118,63 @@ button:disabled {
 
 .delete-button:hover {
   background-color: #c82333;
+}
+
+.email-manager {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.email-manager table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.email-manager th, .email-manager td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.email-manager th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.email-manager tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.email-manager tr:hover {
+  background-color: #f1f1f1;
+}
+
+.email-manager .expandable {
+  cursor: pointer;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.email-manager .expandable:hover {
+  text-decoration: underline;
+}
+
+.email-manager .expanded-content {
+  background-color: #f1f1f1;
+}
+
+.email-manager .email-details {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.email-manager .email-details div {
+  margin-bottom: 8px;
 }

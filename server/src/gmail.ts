@@ -4,13 +4,18 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import * as path from 'path';
 
-const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
+const gmail = google.gmail('v1');
 const TOKEN_PATH = path.join(__dirname, 'token.json');
 const CREDENTIALS_PATH = path.join(__dirname, 'credentials.json');
 
 interface EmailSenderData {
   unsubscribeLink: string;
   emailCount: number;
+}
+
+interface EmailId {
+  id: string;
+  threadId: string;
 }
 
 const authenticateGmail = async (): Promise<OAuth2Client> => {
@@ -28,60 +33,39 @@ const authenticateGmail = async (): Promise<OAuth2Client> => {
     }
 };
 
-const listSubscriptionEmails = async (auth: any) => {
-    const gmail = google.gmail({ version: 'v1', auth });
-    // This code is using the Gmail API to search for messages containing the word "unsubscribe"
-    // It's fetching a list of messages that match this search query
-    const res = await gmail.users.messages.list({
-      userId: 'me',  // 'me' refers to the authenticated user's Gmail account
-      q: 'unsubscribe',  // Search query to find messages with "unsubscribe" in them
+const listMessages = async (auth: any) => {
+  let allMessages: EmailId[] = [];
+  let pageToken = null;
+
+  do {
+    const response: any = await gmail.users.messages.list({
+      userId: 'me',
+      auth,
+      maxResults: 100,  // Fetch 100 at a time
+      pageToken,
     });
-  
-    const messages = res.data.messages || [];
-    // const subscriptions = new Set<string>();
-    const emailSenders: { [sender: string]: EmailSenderData } = {};
 
-  
-    // This loop iterates through each message in the 'messages' array
-    for (const message of messages) {
-      // For each message, we're fetching its full details using the Gmail API
-      // The 'users.messages.get' method retrieves the full message data
-      const msg = await gmail.users.messages.get({
-        userId: 'me',  // 'me' refers to the authenticated user
-        id: message.id!,  // The '!' asserts that message.id is non-null
-      });
-  
-      const headers = msg.data.payload?.headers;
-      const fromHeader = headers?.find(header => header.name === 'From');
-      const unsubscribeHeader = headers?.find(header => header.name === 'List-Unsubscribe');
-  
-      if (fromHeader) {
-        const sender = fromHeader.value || '';
-        // subscriptions.add(sender);
-        console.log(`Subscription found: ${sender}`);
-  
-        if (unsubscribeHeader && unsubscribeHeader.value) {
-          console.log(`Unsubscribe link: ${unsubscribeHeader.value}`);
-          addEmail(emailSenders, sender, unsubscribeHeader.value);
-        }
-      }
-    }
-  
-    return emailSenders;
-  };
+    allMessages = allMessages.concat(response.data.messages || []);
+    pageToken = response.data.nextPageToken;
+  } while (pageToken);
 
-  function addEmail(emailSenders: { [sender: string]: EmailSenderData }, sender: string, unsubscribeLink: string) {
-    if (emailSenders[sender]) {
-      // If the sender already exists, update the email count
-      emailSenders[sender].emailCount += 1;
-    } else {
-      // If the sender doesn't exist, create a new entry
-      emailSenders[sender] = {
-        unsubscribeLink: unsubscribeLink,
-        emailCount: 1
-      };
-    }
+  return allMessages;
+};
+
+const getEmailDetails = async (auth: any, messageId: string) => {
+  try{
+    const response = await gmail.users.messages.get({
+      userId: 'me',
+      id: messageId,
+      auth,
+      format: 'full',
+    });
+    return response.data;
+  } catch (err) {
+    console.error('Error getting email details:', err);
+    return null;
   }
+};
 
-export { authenticateGmail, listSubscriptionEmails };
+export { authenticateGmail, listMessages, getEmailDetails };
 

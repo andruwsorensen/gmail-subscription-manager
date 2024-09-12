@@ -39,6 +39,7 @@ Thumbs.db
 # Sensitive or high-churn files
 server/src/credentials.json
 server/src/token.json
+server/src/emails.json
 
 # Build cache
 .cache/

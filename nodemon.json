@@ -1,0 +1,6 @@
+{
+    "watch": ["server/src"],
+    "ext": "ts,json",
+    "ignore": ["server/src/emails.json", "server/src/credentials.json", "server/src/token.json"],
+    "exec": "ts-node ./server/src/server.ts"
+  }

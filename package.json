@@ -14,13 +14,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "antd": "^5.20.6",
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "google-auth-library": "^9.14.1",
     "googleapis": "^144.0.0"
   },
   "devDependencies": {
+    "@types/antd": "^1.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.5.4",

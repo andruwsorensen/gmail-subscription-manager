@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 interface Subscription {
   id: string;
   email: string;
-  unsubscribeLink: string;
+  unsubscribeLink?: string; // Make this optional
   emailCount: number;
 }
 
@@ -31,7 +31,7 @@ const SubscriptionManager: React.FC = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch subscriptions');
       }
-      const data: Record<string, { unsubscribeLink: string; emailCount: number }> = await response.json();
+      const data: Record<string, { unsubscribeLink?: string; emailCount: number }> = await response.json();
       setSubscriptions(Object.entries(data).map(([email, details], index) => ({
         id: `sub_${index}`,
         email,
@@ -39,7 +39,7 @@ const SubscriptionManager: React.FC = () => {
         emailCount: details.emailCount
       })));
     } catch (err) {
-      setError('An error occurred with Google Authentication');
+      setError('An error occurred while fetching subscriptions');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -62,7 +62,7 @@ const SubscriptionManager: React.FC = () => {
   });
 
   const cleanUrl = (url: string) => {
-    return url.replace(/^<|>$/g, '');
+    return url ? url.replace(/^<|>$/g, '') : '';
   };
 
   const SortButton: React.FC<{ field: SortField; label: string }> = ({ field, label }) => (
@@ -74,7 +74,7 @@ const SubscriptionManager: React.FC = () => {
   return (
     <div className="subscription-manager">
       <button onClick={fetchSubscriptions} disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Fetch Subscriptions'}
+        {isLoading ? 'Loading...' : 'Fetch Emails'}
       </button>
       {error && <p className="error">{error}</p>}
       <div className="subscription-table">
@@ -92,14 +92,18 @@ const SubscriptionManager: React.FC = () => {
             <div className="count-column">{sub.emailCount}</div>
             <div className="email-column">{sub.email}</div>
             <div className="action-column">
-              <a 
-                className="unsubscribe-link"
-                href={cleanUrl(sub.unsubscribeLink)} 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                Unsubscribe
-              </a>
+              {sub.unsubscribeLink ? (
+                <a 
+                  className="unsubscribe-link"
+                  href={cleanUrl(sub.unsubscribeLink)} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  Unsubscribe
+                </a>
+              ) : (
+                <span className="no-unsubscribe">No unsubscribe link</span>
+              )}
             </div>
           </div>
         ))}
